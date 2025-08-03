@@ -52,7 +52,20 @@ const placeOrderRazorpay = async(req , res) => {
 
 //All Orders for a admin panel
 const allOrders = async(req, res) => {
+ try {
+  const orders = await orderModel.find({});
+  res.json({
+    success: true,
+    orders,
+  });
 
+ } catch (error) {
+  console.log(error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+ }
 }
 
 
@@ -65,7 +78,6 @@ const userOrders = async(req, res) => {
       success: true,
       orders,
     });
-
 
   } catch (error) {
     console.log(error);
