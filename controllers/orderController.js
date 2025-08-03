@@ -1,9 +1,39 @@
-
+import orderModel from '../models/orderModel.js';
 
 //PLACING ORDER using COD Method
 
 const placeOrder = async(req , res) => {
+  try {
+    
+    const { userId , amount , items , address} = req.body;
+    const orderData = {
+      userId,
+      amount,
+      items,
+      address,
+      PaymentMethod:"COD",
+      payment:false,
+      Date: Date.now(),
+    }
 
+    const newOrder = new orderModel(orderData);
+    await newOrder.save();
+
+    await orderModel.findByIdAndUpdate(userId, {cartData:{}});
+
+    res.json({
+      success: true,
+      message: "Order Placed Successfully",
+    })
+
+
+  } catch (error) {
+    console.log( error);
+    res.json({
+      success: false,
+      message: error.message,
+    });
+  }
 }
 
 
