@@ -3,7 +3,7 @@ import userModel from '../models/userModel.js';
 import Stripe from 'stripe';
 
 //global variables
-const currency =  'USD';
+const currency =  'inr';
 const deliveryCharges = 10;
 
 
@@ -77,9 +77,9 @@ const placeOrderStripe = async(req , res) => {
         product_data: {
           name: item.name
         },
-        unit_amount: item.price * 100, // Convert to cents
+        unit_amount: item.price * 100 // Convert to cents
       },
-      quantity: item.quantity,
+      quantity: item.quantity
     }))
 
     line_items.push({
@@ -88,19 +88,19 @@ const placeOrderStripe = async(req , res) => {
         product_data: {
           name: "Delivery Charges",
         },
-        unit_amount: deliveryCharges, // Example shipping cost
+        unit_amount: deliveryCharges // Example shipping cost
       },
-      quantity: 1,
+      quantity: 1
     })
 
     const session = await stripe.checkout.sessions.create({
       
-      success_url: `${origin}/verify?succes=true&orderId=${newOrder._id}`,
-      cancel_url: `${origin}/verify?succes=false&orderId=${newOrder._id}`,
+      success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
+      cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
       line_items,
       mode: 'payment',
   
-    });
+    })
     
     res.json({
       success: true,
@@ -119,21 +119,16 @@ const placeOrderStripe = async(req , res) => {
 
 // verify controller for stripe payment
 const verifyStripe = async(req, res) => {
-   const {orderId , success , userId} = req.body;
+   const { orderId , success, userId } = req.body;
+
    try {
-    if(success) {
+    if(success === 'true'){ 
         await orderModel.findByIdAndUpdate(orderId, {payment: true});
         await userModel.findByIdAndUpdate(userId, {cartData: {}});
-        res.json({
-          success: true,
-          message: "Payment Successful and Order Placed",
-        });
+        res.json({success: true});
     }else{
       await orderModel.findByIdAndDelete(orderId);
-      res.json({
-        success: false,
-        message: "Payment Failed, Order Not Placed",
-      });
+      res.json({success: false});
     }
    } catch (error) {
     console.log( error);
