@@ -28,7 +28,7 @@ const addToCart = async (req, res) => {
 
   } catch (error) {
     console.log(error)
-    res.json({ success: false, message: 'Error adding item to cart', error: error.message });
+    res.json({ success: false, message: 'Error adding item to cart in add to cart', error: error.message });
   }
 }
 
@@ -49,7 +49,7 @@ const updateCart = async (req, res) => {
 
   } catch (error) {
      console.log(error)
-    res.json({ success: false, message: 'Error adding item to cart', error: error.message });
+    res.json({ success: false, message: 'Error adding item to cart in update cart', error: error.message });
   }
 }
 
@@ -58,13 +58,17 @@ const getUserCart = async (req, res) => {
   try {
     const { userId } = req.body;
     const userData = await userModel.findById(userId);
+    // Check if the user was found
+    if (!userData) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
     let cartData = await userData.cartData;
 
     res.json({ success: true, message: 'Cart retrieved successfully', cartData });
 
   } catch (error) {
     console.log(error)
-    res.json({ success: false, message: 'Error adding item to cart', error: error.message });
+    res.json({ success: false, message: 'Error adding item to cart in getUserdata', error: error.message });
   
   }
 }
